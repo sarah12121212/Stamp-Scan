@@ -16,7 +16,7 @@ function gotResults(results){
 function setup() {
     createCanvas(800,800);
     video = createCapture(VIDEO);
-    classifier.classifyStart(video, gotResults);
+    classifier.classify(video, gotResults);
 }
 
 function draw() {
