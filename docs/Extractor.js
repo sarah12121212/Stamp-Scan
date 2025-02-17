@@ -17,3 +17,7 @@ function fetchJSON(){
     
 }
 
+fetchJSON().then(data => {
+    console.log('Data received:', data);
+
+});
