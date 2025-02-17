@@ -1,11 +1,10 @@
 let classifier;
-let img;
+let video;
 let label = "slow async...";
 let confidence;
 
 function preload() {
     classifier = ml5.imageClassifier("MobileNet");
-    img = loadImage("images/5.jpg")
 }
 
 function gotResults(results){
@@ -15,8 +14,9 @@ function gotResults(results){
 }
 
 function setup() {
-    createCanvas(400,400);
-    classifier.classify(img, gotResults);
+    createCanvas(800,800);
+    video = createCapture(VIDEO);
+    classifier.classifyStart(video, gotResults);
 }
 
 function draw() {
