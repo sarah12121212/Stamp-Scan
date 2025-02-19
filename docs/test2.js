@@ -109,6 +109,7 @@ function setup() {
     };
 
     video = createCapture(constraints);
+    video.elt.muted = true;
 
     video.elt.onloadeddata = () => {
         console.log("Video has loaded");
