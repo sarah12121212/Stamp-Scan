@@ -4,7 +4,7 @@ let label = "slow async...";
 let modelReady = false;
 let confidence = 0;
 let iterations = 0;
-let imagesData = {"Class 1": "images2/a.jpg", "Class 10": "images2/b.jpg", "Class 11": "images2/c.jpg", "Class 12": "images2/d.jpg", "Class 2": "images2/e.jpg", "Class 3": "images2/f.jpg", "Class 4": "images2/g.jpg","Class 5": "images2/h.jpg", "Class 6": "images2/i.jpg", "Class 7": "images2/j.jpg", "Class 8": "images/k.jpg", "Class 9": "images2/l.jpg"};
+let imagesData = {"Class 1": "images2/1.jpg", "Class 10": "images2/10.jpg", "Class 11": "images2/11.jpg", "Class 12": "images2/12.jpg", "Class 13": "images2/13.jpg", "Class 2": "images2/2.jpg", "Class 3": "images2/3.jpg", "Class 4": "images2/4.jpg","Class 5": "images2/5.jpg", "Class 6": "images2/6.jpg", "Class 7": "images2/7.jpg", "Class 8": "images2/8.jpg", "Class 9": "images2/9.jpg"};
 let i;
 let img;
 let header;
@@ -27,7 +27,7 @@ popupWindow.style.display = 'none';
 
 
 function preload() {
-    classifier = ml5.imageClassifier("https://teachablemachine.withgoogle.com/models/O6Thh6591/", modelLoaded);
+    classifier = ml5.imageClassifier("https://teachablemachine.withgoogle.com/models/Qg_34YlBm/", modelLoaded);
 
 }
 
