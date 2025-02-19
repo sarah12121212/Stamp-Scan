@@ -105,7 +105,8 @@ function setup() {
     const constraints = {
         video: {
             facingMode: "environment"
-        }
+        },
+        audio: false
     };
 
     video = createCapture(constraints);
