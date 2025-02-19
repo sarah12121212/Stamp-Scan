@@ -99,7 +99,16 @@ function modelLoaded() {
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    video = createCapture(VIDEO);
+
+
+    // back camera:
+    const constraints = {
+        video: {
+            facingMode: "environment"
+        }
+    };
+
+    video = createCapture(constraints);
 
     video.elt.onloadeddata = () => {
         console.log("Video has loaded");
