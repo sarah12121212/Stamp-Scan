@@ -118,7 +118,7 @@ function gotResults(error, results){
 let model;
 
 async function loadModel2() {
-    const modelUrl = 'https://raw.githubusercontent.com/sarah12121212/Stamp-Scan/refs/heads/main/docs/panel10_mobilenettest/model.json';
+    const modelUrl = 'https://raw.githubusercontent.com/sarah12121212/Stamp-Scan/refs/heads/main/docs/panel10_b0/model.json';
     console.log("modelURL:", modelUrl);
     try {
         console.log("Loading model from:", modelUrl);
