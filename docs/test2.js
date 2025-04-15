@@ -26,12 +26,33 @@ popupWindow.style.display = 'none';
 //     .catch(error => console.error('Error loading images.json:', error));
 
 
-function preload() {
-    classifier = ml5.imageClassifier("https://teachablemachine.withgoogle.com/models/Qg_34YlBm/", modelLoaded);
+// function preload() {
+//     classifier = ml5.imageClassifier("https://teachablemachine.withgoogle.com/models/Qg_34YlBm/", modelLoaded);
 
-}
+// }
 
-
+// class TFOpLambda extends tf.layers.Layer {
+//     constructor(config) {
+//       super(config);
+//       this.name = config.name;
+//       this.function = config.function;
+//     }
+  
+//     call(input) {
+//       return tf.tidy(() => {
+//         // Implement the function here
+//         // For example, if function is 'math.truediv':
+//         return tf.div(input, 127.5);
+//       });
+//     }
+  
+//     computeOutputShape(inputShape) {
+//       // Implement the output shape calculation here
+//       return inputShape;
+//     }
+//   }
+  
+//   tf.serialization.registerClass(TFOpLambda);
 
 function gotResults(error, results){
     console.log("In gotResults");
@@ -82,23 +103,69 @@ function gotResults(error, results){
 
 
 
-        return;
-
-        
+        return;   
     }
-    
     // Endless loop
     classifier.classify(video, gotResults);
     //
 }
 
-function modelLoaded() {
-    console.log("Model Loaded Successfully!");
-    modelReady = true;
+// function modelLoaded() {
+//     console.log("Model Loaded Successfully!");
+//     modelReady = true;
+// }
+
+let model;
+
+async function loadModel2() {
+    const modelUrl = 'https://raw.githubusercontent.com/sarah12121212/Stamp-Scan/main/docs/panel10_mobilenetv3/model.json';
+    console.log("modelURL:", modelUrl);
+    try {
+        console.log("Loading model from:", modelUrl);
+        model = await tf.loadLayersModel(modelUrl);
+        console.log("Model Loaded");
+        modelReady = true;
+    } catch (error) {
+        console.error("Error loading model:", error);
+    }
+    //console.log("Hello from loadModel()");
 }
+
+function preprocessVideoFrame(video) {
+    return tf.tidy(() => {
+        let tensor = tf.browser.fromPixels(video)
+            .resizeNearestNeighbor([224, 224]) // match MobileNet input size
+            .toFloat()
+            .div(255.0)
+            .expandDims();
+        return tensor;
+    });
+}
+
+async function classifyFrame() {
+    if (modelReady && video && video.elt.readyState === 4) {
+        const inputTensor = preprocessVideoFrame(video.elt);
+        const prediction = await model.predict(inputTensor).data();
+        inputTensor.dispose();
+
+        // find top prediction
+        const maxIdx = prediction.indexOf(Math.max(...prediction));
+        label = `Class ${maxIdx}`;
+        confidence = prediction[maxIdx];
+
+        if (confidence > 0.98 && iterations > 50) {
+            popupWindow.style.display = "block";
+        }
+    }
+
+    requestAnimationFrame(classifyFrame);
+}
+
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
+
+    console.log("starting setup...");
 
 
     // back camera:
@@ -108,14 +175,14 @@ function setup() {
         },
         audio: false
     };
-
+    loadModel2();
     video = createCapture(constraints);
     video.elt.muted = true;
 
     video.elt.onloadeddata = () => {
         console.log("Video has loaded");
         if (modelReady) {
-            classifier.classify(video, gotResults);
+            classifyFrame();
         } else {
             console.log("Model not ready yet...");
         }
