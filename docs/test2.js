@@ -13,8 +13,8 @@ let header;
 let confidencePara;
 let gyroThreshold = 1;
 let accelThreshold = 1;
-let isSlowGyro=false;
-let isSlowAccel=false;
+let isSlowGyro=true;
+let isSlowAccel=true;
 
 var popupWindow = document.getElementById("popup-window");
 var closeButton = document.getElementById("close-button");
@@ -60,10 +60,26 @@ popupWindow.style.display = 'none';
   
 //   tf.serialization.registerClass(TFOpLambda);
 
+document.getElementById("startMotion").addEventListener("click", () => {
+    if (typeof DeviceMotionEvent.requestPermission === "function") {
+        DeviceMotionEvent.requestPermission()
+            .then((response) => {
+                if (response === "granted") {
+                    console.log("Gyroscope access granted");
+                } else {
+                    console.log("Gyroscope access denied");
+                    // Optionally, set the slow vars so they don’t interfere
+                    isSlowGyro = true;
+                    isSlowAccel = true;
+                }
+            })
+            .catch(console.error);
+    }
+});
+
 window.addEventListener("devicemotion", (event) => {
 
-
-    // Gyro
+    let gyroMagnitude = 0;
     const rotationRate = event.rotationRate;
     if (rotationRate) {
         // equation for norm of vector through x y z dimensions
@@ -76,6 +92,7 @@ window.addEventListener("devicemotion", (event) => {
     isSlowGyro = gyroMagnitude < gyroThreshold;
 
     // Translation motion
+    let accelMagnitude = 0;
     const acceleration = event.acceleration;
     if (acceleration) {
         // equation for norm of vector through x y z dimensions
@@ -145,20 +162,20 @@ function gotResults(error, results){
     //
 }
 
-if (typeof DeviceMotionEvent.requestPermission === "function") {
-    DeviceMotionEvent.requestPermission()
-        .then((response) => {
-            if (response === "granted") {
-                console.log("Gyroscope access granted");
-            }else{
-                console.log("Gyroscope access denied");
-                // set slow vars to true so they don't interfere
-                isSlowGyro = true;
-                isSlowAccel = true;
-            }
-        })
-        .catch(console.error);
-}
+// if (typeof DeviceMotionEvent.requestPermission === "function") {
+//     DeviceMotionEvent.requestPermission()
+//         .then((response) => {
+//             if (response === "granted") {
+//                 console.log("Gyroscope access granted");
+//             }else{
+//                 console.log("Gyroscope access denied");
+//                 // set slow vars to true so they don't interfere
+//                 isSlowGyro = true;
+//                 isSlowAccel = true;
+//             }
+//         })
+//         .catch(console.error);
+// }
 
 // function modelLoaded() {
 //     console.log("Model Loaded Successfully!");
@@ -196,7 +213,7 @@ async function classifyFrame() {
         iterations++;
         const inputTensor = preprocessVideoFrame(video.elt);
         const prediction = await model.predict(inputTensor).data();
-        console.log(prediction);
+        //console.log(prediction);
         
         inputTensor.dispose();
 
@@ -206,8 +223,9 @@ async function classifyFrame() {
         //label = `Class ${maxIdx}`;
         confidence = prediction[maxIdx];
         label = `Class ${pred}`;
+        console.log(isSlowAccel, isSlowGyro);
 
-        if (confidence > 0.98 && !isSlowGyro && !isSlowAccel && iterations > 50) {
+        if (confidence > 0.98 && isSlowGyro && isSlowAccel && iterations > 50) {
             popupWindow.style.display = "block";
             i = 1; // don't remember why i is being used here, but it is
             if (i) {
