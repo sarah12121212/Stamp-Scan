@@ -1,0 +1,11 @@
+tfjs@latest:17 Uncaught (in promise) Error: Tensor values for a float32 Tensor must be in the range [0 - 1] but encountered 92.
+    at tfjs@latest:17:446415
+    at h (tfjs@latest:17:2100)
+    at Generator.<anonymous> (tfjs@latest:17:3441)
+    at Generator.next (tfjs@latest:17:2463)
+    at u (tfjs@latest:17:8324)
+    at o (tfjs@latest:17:8527)
+
+
+
+    .\tfjs-cpu-env\Scripts\activate

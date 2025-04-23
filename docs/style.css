@@ -133,10 +133,11 @@ body {
 
 .round-img {
   border-radius: 2%; /* Adjust the value as needed */
-  width: 50%; /* Adjust the value as needed */
+  height: 50%; /* Adjust the value as needed */
   margin-bottom: 5%; /* Space between image and text */
   margin-top: 5%; /* Space between image and text */
   opacity: 1;
+  transform: scaleX(-1);
   /*position: relative;
   /*left: 25%; */
 }
@@ -172,4 +173,24 @@ body {
   font-family: "Arvo", serif;
   font-weight: 700;
   font-style: italic;
+}
+
+#scanButton {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4CAF50; /* Green color */
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 15px 30px;
+  font-size: 18px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+
+#scanButton:active {
+  background-color: #45a049;
 }
