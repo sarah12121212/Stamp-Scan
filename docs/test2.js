@@ -129,24 +129,57 @@ async function classifyFrame() {
                 img.src = imagePath;
                 popupWindow.appendChild(img);
     
-                header = document.createElement('h1');
-                header.textContent = label;
-                popupWindow.appendChild(header);
+                //header = document.createElement('h1');
+                //header.textContent = label;
+                //popupWindow.appendChild(header);
     
-                confidencePara = document.createElement('p');
-                confidencePara.textContent = `Confidence: ${confidence}`;
-                popupWindow.appendChild(confidencePara);
+                //confidencePara = document.createElement('p');
+                //confidencePara.textContent = `Confidence: ${confidence}`;
+                //popupWindow.appendChild(confidencePara);
+                const order = ["Title", "Description", "PUBLICATION Info as of April 15, 2025", "page number", "Panel #", "Accession #"];
 
                 const match = classData.find(row => row["Accession #"] === pred);
-                if (match) {
-                    Object.entries(match).forEach(([key, value]) => {
-                        if (key !== "Accession #") {
-                            const para = document.createElement('p');
-                            para.textContent = value;
-                            popupWindow.appendChild(para);
-                        }
-                    });
-                }
+                console.log("Match: ", match);
+                
+                order.forEach((key) => {
+                    
+                    if (match[key] && key == "Title") {
+                        console.log("Title: ", match[key]);
+                        const para = document.createElement('p');
+                        para.innerHTML = `<span style="font-size: 50px; fontWeight: bold;">${match[key].replace(/\n/g, '<br>')}</span>`;
+                        //para.style.fontSize = "30px";
+                        //para.style.fontWeight = "bold";
+
+                        const breakpt = document.createElement('br');
+                        popupWindow.appendChild(breakpt);
+                        popupWindow.appendChild(para);
+                    }
+                    else if (match[key] && key == "Accession #") {
+                        const para = document.createElement('p');
+                        para.textContent = "Block no. " + match[key];
+                        para.style.fontSize = "16px";
+                        popupWindow.appendChild(para);
+
+                    }    else if (match[key] && key == "Panel #") {
+                        const breakpt = document.createElement('br');
+                        popupWindow.appendChild(breakpt);
+                        const para = document.createElement('p');
+                        para.textContent = "Panel: " + match[key];
+                        para.style.fontSize = "16px";
+                        popupWindow.appendChild(para);
+                    }   
+                        else if (match[key] && key == "page number") {
+                        const para = document.createElement('p');
+                        para.textContent = "Page: " + match[key];
+                        para.style.fontSize = "16px";
+                        popupWindow.appendChild(para);
+                    } else if (match[key]){
+                        const para = document.createElement('p');
+                        para.innerHTML = match[key].replace(/\n/g, '<br>');
+                        para.style.fontSize = "16px";
+                        popupWindow.appendChild(para);
+                    }
+                });
                  
 
 
@@ -209,16 +242,14 @@ async function classifyFrame() {
 // Load CSV data
 async function loadCSVData() {
     const response = await fetch('https://raw.githubusercontent.com/sarah12121212/Stamp-Scan/refs/heads/main/docs/class_data.csv');
-    const text = await response.text();
-    const rows = text.split('\n').map(row => row.split(','));
-    const headers = rows[0];
-    classData = rows.slice(1).map(row => {
-        let obj = {};
-        headers.forEach((header, i) => {
-            obj[header.trim()] = row[i]?.trim();
-        });
-        return obj;
+    const csvText = await response.text();
+
+    const parsed = Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true,
     });
+
+    classData = parsed.data;
 }
 
 function setup() {
@@ -294,10 +325,18 @@ function draw() {
 closeButton.addEventListener("click", function() {
     popupWindow.style.display = "none";
 
-    popupWindow.removeChild(confidencePara);
-    popupWindow.removeChild(header); 
+    //popupWindow.removeChild(confidencePara);
+    //popupWindow.removeChild(header); 
     popupWindow.removeChild(img);
 
+    //check if para exists before removing it
+    //const para = popupWindow.querySelector('p);
+    const allParas = popupWindow.querySelectorAll('p');
+    allParas.forEach(p => {
+
+        popupWindow.removeChild(p);
+        
+    });
     video.play();
     //classifyFrame();
     //setup();
