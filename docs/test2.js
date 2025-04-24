@@ -12,15 +12,17 @@ let i;
 let img;
 let header;
 let confidencePara;
-
+let classData = [];
 // an array the same size as the number of classes in the model
 
 let pred_buckets = new Array(classes.length).fill(0);
 
 
 
+
 var popupWindow = document.getElementById("popup-window");
 var closeButton = document.getElementById("close-button");
+var wrongButton = document.getElementById("wrong-button");
 
 popupWindow.style.display = 'none';
 
@@ -75,6 +77,13 @@ async function loadModel2() {
         model = await tf.loadLayersModel(modelUrl);
         console.log("Model Loaded");
         modelReady = true;
+
+
+        const warmupTensor = tf.zeros([1, 224, 224, 3]);
+        model.predict(warmupTensor).dispose(); // run and dispose immediately
+        warmupTensor.dispose();
+
+        console.log("Model warmed up");
     } catch (error) {
         console.error("Error loading model:", error);
     }
@@ -127,9 +136,32 @@ async function classifyFrame() {
                 confidencePara = document.createElement('p');
                 confidencePara.textContent = `Confidence: ${confidence}`;
                 popupWindow.appendChild(confidencePara);
+
+                const match = classData.find(row => row["Accession #"] === pred);
+                if (match) {
+                    Object.entries(match).forEach(([key, value]) => {
+                        if (key !== "Accession #") {
+                            const para = document.createElement('p');
+                            para.textContent = value;
+                            popupWindow.appendChild(para);
+                        }
+                    });
+                }
                  
+
+
+                // sort through pred_buckets and find the top 10 classes and their confidences
+
+                top10 = pred_buckets.map((value, index) => ({ value, index }))       // Step 1
+                .sort((a, b) => b.value - a.value)                // Step 2
+                .slice(0, 10);    
+
+                console.log("Pred buckets: ", pred_buckets);
+                console.log("Top 10 predictions: ", top10);
+
                 iterations = 0;
                 pred_buckets.fill(0);
+
                 return;
                 
 
@@ -174,6 +206,20 @@ async function classifyFrame() {
     return;
 }
 
+// Load CSV data
+async function loadCSVData() {
+    const response = await fetch('https://raw.githubusercontent.com/sarah12121212/Stamp-Scan/refs/heads/main/docs/class_data.csv');
+    const text = await response.text();
+    const rows = text.split('\n').map(row => row.split(','));
+    const headers = rows[0];
+    classData = rows.slice(1).map(row => {
+        let obj = {};
+        headers.forEach((header, i) => {
+            obj[header.trim()] = row[i]?.trim();
+        });
+        return obj;
+    });
+}
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -189,6 +235,10 @@ function setup() {
         audio: false
     };
     loadModel2();
+    loadCSVData();
+    console.log("csv loaded");
+    // only show scan button if model is loaded
+
     video = createCapture(constraints);
     video.elt.muted = true;
 
@@ -203,6 +253,9 @@ function setup() {
         //classifier.classify(video, gotResults);
     }
     //classifier.classify(video, gotResults);
+    video.elt.style.objectFit = "cover";
+    video.elt.style.width = "100vw";
+    video.elt.style.height = "100vh";
     video.hide();
 }
 
@@ -251,7 +304,102 @@ closeButton.addEventListener("click", function() {
 });
 
 
+wrongButton.addEventListener("click", function() {
+    popupWindow.style.display = "none";
 
+    popupWindow.removeChild(confidencePara);
+    popupWindow.removeChild(header); 
+    popupWindow.removeChild(img);
+
+    // clear any previous list content
+    const existingList = document.getElementById("top10-list");
+    if (existingList) {
+        popupWindow.removeChild(existingList);
+    }
+
+    const listContainer = document.createElement("div");
+    listContainer.id = "top10-list";
+    listContainer.style.maxHeight = "80vh";
+    listContainer.style.overflowY = "auto";
+    listContainer.style.padding = "10px";
+    listContainer.style.borderTop = "1px solid #ccc";
+
+    top10.forEach(entry => {
+        const container = document.createElement("div");
+        container.style.display = "flex";
+        container.style.alignItems = "center";
+        container.style.marginBottom = "15px";
+        container.style.cursor = "pointer";
+        container.style.border = "1px solid #ddd";
+        container.style.padding = "10px";
+        container.style.borderRadius = "10px";
+        container.style.backgroundColor = "#f9f9f9";
+    
+        const image = document.createElement("img");
+        image.src = `classimages/${classes[entry.index]}.jpg`;
+        image.style.width = "80px";
+        image.style.height = "80px";
+        image.style.objectFit = "cover";
+        image.style.marginRight = "15px";
+        image.style.borderRadius = "10px";
+    
+        const text = document.createElement("div");
+        text.innerHTML = `<strong>Class ${classes[entry.index]}</strong><br>Score: ${entry.value.toFixed(2)}`;
+    
+        container.appendChild(image);
+        container.appendChild(text);
+    
+        container.addEventListener("click", () => {
+            // popupWindow.innerHTML = "";
+    
+            // const largeImg = document.createElement("img");
+            // largeImg.src = `classimages/${classes[entry.index]}.jpg`;
+            // largeImg.classList.add("round-img");
+    
+            // const classHeader = document.createElement("h1");
+            // classHeader.textContent = `Class ${classes[entry.index]}`;
+    
+            // const scorePara = document.createElement("p");
+            // scorePara.textContent = `Score: ${entry.value.toFixed(2)}`;
+            // const closeBtn = document.createElement("button");
+            // closeBtn.textContent = "Close";
+            // closeBtn.style.marginTop = "10px";
+            // closeBtn.onclick = () => {
+            //     popupWindow.style.display = "none";
+            //     popupWindow.innerHTML = ""; // reset
+
+//            };
+
+            popupWindow.style.display = "block";
+
+
+            const imagePath = `classimages/${classes[entry.index]}.jpg`;
+            img = document.createElement('img');
+            img.classList.add("round-img");
+            img.src = imagePath;
+            popupWindow.appendChild(img);
+
+            header = document.createElement('h1');
+            header.textContent = label;
+            popupWindow.appendChild(header);
+
+            confidencePara = document.createElement('p');
+            confidencePara.textContent = `Confidence: ${confidence}`;
+            popupWindow.appendChild(confidencePara);
+    
+            popupWindow.appendChild(largeImg);
+            popupWindow.appendChild(classHeader);
+            popupWindow.appendChild(scorePara);
+            popupWindow.appendChild(closeBtn);
+            popupWindow.style.display = "block";
+        });
+    
+        listContainer.appendChild(container);
+    });
+
+    popupWindow.appendChild(listContainer);
+    popupWindow.style.display = "block";
+});
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -259,3 +407,19 @@ function sleep(ms) {
 
 
 
+// function move() {
+
+//     var elem = document.getElementById("myBar");
+//     var width = 1;
+//     var id = setInterval(frame, 10);
+//     function frame() {
+//         if (width >= 100) {
+//         clearInterval(id);
+//         i = 0;
+//         } else {
+//         width++;
+//         elem.style.width = width + "%";
+//         }
+    
+//     }
+// }
