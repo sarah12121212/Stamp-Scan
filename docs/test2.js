@@ -334,25 +334,26 @@ closeButton.addEventListener("click", function() {
     //popupWindow.removeChild(confidencePara);
     //popupWindow.removeChild(header);
 
-    // if img exists, remove it
-    const img = popupWindow.querySelector('img');
-    if (img) {
+
+
+    //const img = popupWindow.querySelector('img');
+    if (img && popupWindow.contains(img)) {
         popupWindow.removeChild(img);
     }
 
-    // if listContainer exists, remove it
+
     const listContainer = popupWindow.querySelector('#top10-list');
-    if (listContainer) {
+    if (listContainer && popupWindow.contains(listContainer)) {
         popupWindow.removeChild(listContainer);
     }
-    
 
     //check if para exists before removing it
     //const para = popupWindow.querySelector('p);
     const allParas = popupWindow.querySelectorAll('p');
     allParas.forEach(p => {
-
-        popupWindow.removeChild(p);
+        if (popupWindow.contains(p)) {
+            popupWindow.removeChild(p);
+        }
         
     });
 
