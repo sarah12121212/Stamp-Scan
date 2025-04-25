@@ -1,6 +1,5 @@
 let classifier;
 let video;
-let label = "slow async...";
 let modelReady = false;
 let confidence = 0;
 let iterations = 0;
@@ -28,7 +27,7 @@ popupWindow.style.display = 'none';
 
 function startScanning() {
     isScanning = true;
-    scanButton.style.backgroundColor = '#388e3c'; // darker green
+    scanButton.style.backgroundColor = '#919191'; 
     scanButton.textContent = 'SCANNING...';
     runScanLoop();
 }
@@ -36,7 +35,7 @@ function startScanning() {
 function stopScanning() {
     isScanning = false;
     pred_buckets.fill(0); // reset the prediction buckets
-    scanButton.style.backgroundColor = '#4CAF50'; // original green
+    scanButton.style.backgroundColor = '#ffffff'; 
     scanButton.textContent = 'SCAN';
 }
 
@@ -48,7 +47,7 @@ function runScanLoop() {
     }
 }
 
-const scanButton = document.getElementById('scanButton');
+const scanButton = document.getElementById('scan-button');
 
 // Desktop
 scanButton.addEventListener('mousedown', startScanning);
@@ -117,9 +116,13 @@ async function classifyFrame() {
         // iterate over each bucket and check if it is greater than 100
         for (let j = 0; j < pred_buckets.length; j++) {
             if (pred_buckets[j] > 100) {
+
+                //hide the scan button
+                scanButton.style.display = "none";
+
                 pred = classes[j];
                 confidence = prediction[j];
-                label = `Class ${pred}`;
+                //label = `Class ${pred}`;
                 popupWindow.style.display = "block";
 
                 video.pause();
@@ -146,18 +149,20 @@ async function classifyFrame() {
                     if (match[key] && key == "Title") {
                         console.log("Title: ", match[key]);
                         const para = document.createElement('p');
-                        para.innerHTML = `<span style="font-size: 50px; fontWeight: bold;">${match[key].replace(/\n/g, '<br>')}</span>`;
+                        para.innerHTML = `<span style="font-size: 40px; fontWeight: bold;">${match[key].replace(/\n/g, '<br>')}</span>`;
                         //para.style.fontSize = "30px";
                         //para.style.fontWeight = "bold";
 
                         const breakpt = document.createElement('br');
-                        popupWindow.appendChild(breakpt);
+
                         popupWindow.appendChild(para);
+                        popupWindow.appendChild(breakpt);
+                        popupWindow.appendChild(breakpt);
                     }
                     else if (match[key] && key == "Accession #") {
                         const para = document.createElement('p');
                         para.textContent = "Block no. " + match[key];
-                        para.style.fontSize = "16px";
+                        para.style.fontSize = "24px";
                         popupWindow.appendChild(para);
 
                     }    else if (match[key] && key == "Panel #") {
@@ -165,29 +170,29 @@ async function classifyFrame() {
                         popupWindow.appendChild(breakpt);
                         const para = document.createElement('p');
                         para.textContent = "Panel: " + match[key];
-                        para.style.fontSize = "16px";
+                        para.style.fontSize = "24px";
                         popupWindow.appendChild(para);
                     }   
                         else if (match[key] && key == "page number") {
                         const para = document.createElement('p');
                         para.textContent = "Page: " + match[key];
-                        para.style.fontSize = "16px";
+                        para.style.fontSize = "24px";
                         popupWindow.appendChild(para);
                     } else if (match[key]){
                         const para = document.createElement('p');
                         para.innerHTML = match[key].replace(/\n/g, '<br>');
-                        para.style.fontSize = "16px";
+                        para.style.fontSize = "24px";
                         popupWindow.appendChild(para);
                     }
                 });
                  
 
 
-                // sort through pred_buckets and find the top 10 classes and their confidences
+                // sort through pred_buckets and find the top 10 classes and their confidences (changed to top 20)
 
-                top10 = pred_buckets.map((value, index) => ({ value, index }))       // Step 1
-                .sort((a, b) => b.value - a.value)                // Step 2
-                .slice(0, 10);    
+                top10 = pred_buckets.map((value, index) => ({ value, index }))      
+                .sort((a, b) => b.value - a.value)                
+                .slice(0, 20);    
 
                 console.log("Pred buckets: ", pred_buckets);
                 console.log("Top 10 predictions: ", top10);
@@ -290,33 +295,34 @@ function setup() {
     video.hide();
 }
 
+
 function draw() {
     background(220);
     image(video, 0, 0, width, height);
 
-    rectMode(CENTER);
-    fill(0);
-    rect(width/2, height -70, width, 50);
-    textSize(32);
+    // rectMode(CENTER);
+    // fill(0);
+    // rect(width/2, height -70, width, 50);
+    // textSize(32);
 
 
-    fill(255);
-    textAlign(CENTER, CENTER);
-    noStroke();
-    text(label, width/2, height -70);
+    //fill(255);
+    //textAlign(CENTER, CENTER);
+    //noStroke();
+    //text(label, width/2, height -70);
 
     //text(confidence, 200, 200);
 
-    rectMode(CENTER);
-    fill(0);
-    rect(width/2, height -20, width, 50);
-    textSize(32);
+    // rectMode(CENTER);
+    // fill(0);
+    // rect(width/2, height -20, width, 50);
+    // textSize(32);
 
 
-    fill(255);
-    textAlign(CENTER, CENTER);
-    noStroke();
-    text(confidence, width/2, height -20);
+    // fill(255);
+    // textAlign(CENTER, CENTER);
+    // noStroke();
+    // text(confidence, width/2, height -20);
 
 
 }
@@ -326,8 +332,20 @@ closeButton.addEventListener("click", function() {
     popupWindow.style.display = "none";
 
     //popupWindow.removeChild(confidencePara);
-    //popupWindow.removeChild(header); 
-    popupWindow.removeChild(img);
+    //popupWindow.removeChild(header);
+
+    // if img exists, remove it
+    const img = popupWindow.querySelector('img');
+    if (img) {
+        popupWindow.removeChild(img);
+    }
+
+    // if listContainer exists, remove it
+    const listContainer = popupWindow.querySelector('#top10-list');
+    if (listContainer) {
+        popupWindow.removeChild(listContainer);
+    }
+    
 
     //check if para exists before removing it
     //const para = popupWindow.querySelector('p);
@@ -337,7 +355,10 @@ closeButton.addEventListener("click", function() {
         popupWindow.removeChild(p);
         
     });
+
     video.play();
+    //show the scan button again
+    scanButton.style.display = "block";
     //classifyFrame();
     //setup();
 });
@@ -346,15 +367,23 @@ closeButton.addEventListener("click", function() {
 wrongButton.addEventListener("click", function() {
     popupWindow.style.display = "none";
 
-    popupWindow.removeChild(confidencePara);
-    popupWindow.removeChild(header); 
-    popupWindow.removeChild(img);
+    //popupWindow.removeChild(confidencePara);
+    // popupWindow.removeChild(header); 
+     popupWindow.removeChild(img);
 
     // clear any previous list content
-    const existingList = document.getElementById("top10-list");
-    if (existingList) {
-        popupWindow.removeChild(existingList);
-    }
+
+    const allParas = popupWindow.querySelectorAll('p');
+    allParas.forEach(p => {
+
+        popupWindow.removeChild(p);
+        
+    });
+
+    // const existingList = document.getElementById("top10-list");
+    // if (existingList) {
+    //     popupWindow.removeChild(existingList);
+    // }
 
     const listContainer = document.createElement("div");
     listContainer.id = "top10-list";
@@ -362,12 +391,14 @@ wrongButton.addEventListener("click", function() {
     listContainer.style.overflowY = "auto";
     listContainer.style.padding = "10px";
     listContainer.style.borderTop = "1px solid #ccc";
+    listContainer.style.marginRight = "15px";
 
     top10.forEach(entry => {
         const container = document.createElement("div");
         container.style.display = "flex";
         container.style.alignItems = "center";
         container.style.marginBottom = "15px";
+        container.style.marginRight = "15px";
         container.style.cursor = "pointer";
         container.style.border = "1px solid #ddd";
         container.style.padding = "10px";
@@ -376,8 +407,8 @@ wrongButton.addEventListener("click", function() {
     
         const image = document.createElement("img");
         image.src = `classimages/${classes[entry.index]}.jpg`;
-        image.style.width = "80px";
-        image.style.height = "80px";
+        image.style.width = "200px";
+        image.style.height = "250px";
         image.style.objectFit = "cover";
         image.style.marginRight = "15px";
         image.style.borderRadius = "10px";
@@ -389,7 +420,23 @@ wrongButton.addEventListener("click", function() {
         container.appendChild(text);
     
         container.addEventListener("click", () => {
-            // popupWindow.innerHTML = "";
+
+            const listContainer = document.getElementById("top10-list");
+            if (listContainer) {
+                listContainer.remove();
+            }
+            // const images = popupWindow.querySelectorAll("img");
+            // images.forEach(img => popupWindow.removeChild(img));
+
+            // const paragraphs = popupWindow.querySelectorAll("p");
+            // paragraphs.forEach(p => popupWindow.removeChild(p));
+
+            // const divs = popupWindow.querySelectorAll("div");
+            // divs.forEach(div => popupWindow.removeChild(div));
+
+             //add the close-button back to the popup window
+            // const closeButton = document.getElementById("close-button");
+            // popupWindow.appendChild(closeButton);
     
             // const largeImg = document.createElement("img");
             // largeImg.src = `classimages/${classes[entry.index]}.jpg`;
@@ -409,7 +456,7 @@ wrongButton.addEventListener("click", function() {
 
 //            };
 
-            popupWindow.style.display = "block";
+            //popupWindow.style.display = "none";
 
 
             const imagePath = `classimages/${classes[entry.index]}.jpg`;
@@ -418,19 +465,70 @@ wrongButton.addEventListener("click", function() {
             img.src = imagePath;
             popupWindow.appendChild(img);
 
-            header = document.createElement('h1');
-            header.textContent = label;
-            popupWindow.appendChild(header);
+            const order = ["Title", "Description", "PUBLICATION Info as of April 15, 2025", "page number", "Panel #", "Accession #"];
 
-            confidencePara = document.createElement('p');
-            confidencePara.textContent = `Confidence: ${confidence}`;
-            popupWindow.appendChild(confidencePara);
+            const match = classData.find(row => row["Accession #"] === classes[entry.index]);
+            console.log("Match: ", match);
+            
+            order.forEach((key) => {
+                
+                if (match[key] && key == "Title") {
+                    console.log("Title: ", match[key]);
+                    const para = document.createElement('p');
+                    para.innerHTML = `<span style="font-size: 40px; fontWeight: bold;">${match[key].replace(/\n/g, '<br>')}</span>`;
+                    //para.style.fontSize = "30px";
+                    //para.style.fontWeight = "bold";
+
+                    const breakpt = document.createElement('br');
+
+                    popupWindow.appendChild(para);
+                    popupWindow.appendChild(breakpt);
+                    popupWindow.appendChild(breakpt);
+                }
+                else if (match[key] && key == "Accession #") {
+                    const para = document.createElement('p');
+                    para.textContent = "Block no. " + match[key];
+                    para.style.fontSize = "24px";
+                    popupWindow.appendChild(para);
+
+                }    else if (match[key] && key == "Panel #") {
+                    const breakpt = document.createElement('br');
+                    popupWindow.appendChild(breakpt);
+                    const para = document.createElement('p');
+                    para.textContent = "Panel: " + match[key];
+                    para.style.fontSize = "24px";
+                    popupWindow.appendChild(para);
+                }   
+                    else if (match[key] && key == "page number") {
+                    const para = document.createElement('p');
+                    para.textContent = "Page: " + match[key];
+                    para.style.fontSize = "24px";
+                    popupWindow.appendChild(para);
+                } else if (match[key]){
+                    const para = document.createElement('p');
+                    para.innerHTML = match[key].replace(/\n/g, '<br>');
+                    para.style.fontSize = "24px";
+                    popupWindow.appendChild(para);
+                }
+            });
+                 
+
+            // header = document.createElement('h1');
+            // header.textContent = label;
+            // popupWindow.appendChild(header);
+
+            // confidencePara = document.createElement('p');
+            // confidencePara.textContent = `Confidence: ${confidence}`;
+            // popupWindow.appendChild(confidencePara);
     
-            popupWindow.appendChild(largeImg);
-            popupWindow.appendChild(classHeader);
-            popupWindow.appendChild(scorePara);
-            popupWindow.appendChild(closeBtn);
-            popupWindow.style.display = "block";
+            // popupWindow.appendChild(largeImg);
+            // popupWindow.appendChild(classHeader);
+            // popupWindow.appendChild(scorePara);
+            // popupWindow.appendChild(closeBtn);
+            // popupWindow.style.display = "block";
+
+
+
         });
     
         listContainer.appendChild(container);

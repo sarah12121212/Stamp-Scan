@@ -175,14 +175,14 @@ body {
   font-style: italic;
 }
 
-#scanButton {
+#scan-button {
   position: fixed;
   bottom: 20%;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #4CAF50;
-  color: white;
-  border: 4px solid #2e7d32;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  border: 4px solid #919191;
   border-radius: 50%; 
   width: 150px;       
   height: 150px;      
@@ -194,8 +194,45 @@ body {
   line-height: 100px; 
 }
 
+#wrong-button {
+  position: fixed;
+  bottom: 5%;
+  right: 2%;
+  transform: translateX(-50%);
+  background-color: #a7a7a7;
+  color: white;
+  border: none;
+  border-radius: 15%; 
+  width: 160px;       
+  height: 100px;      
+  font-size: 22px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  text-align: center;
+  line-height: 100px; 
+}
+
+#close-button {
+  position: fixed;
+  top: 5%;
+  right: 5%;
+  background-color: #af4c4c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 18px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  text-align: center;
+
+}
+
 #scanButton:active {
-  background-color: #45a049;
+  background-color: #686868;
 }
 
 #myProgress {
