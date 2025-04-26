@@ -258,6 +258,7 @@ async function loadCSVData() {
 }
 
 function setup() {
+    
     createCanvas(windowWidth, windowHeight);
 
     console.log("starting setup...");
@@ -297,7 +298,7 @@ function setup() {
 
 
 function draw() {
-    background(220);
+    //background(220);
     image(video, 0, 0, width, height);
 
     // rectMode(CENTER);
