@@ -130,12 +130,34 @@ async function classifyFrame() {
         percentage = Math.round(max_bucket / 50 * 100); // convert to percentage
         progressButton.style.background = `linear-gradient(to right, #17a2b8 ${percentage}%, #e9ecef ${percentage}%)`;
         progressButton.textContent = `${percentage}%`; 
+        
 
         if (max_bucket > 50) {
 
             //hide the scan button
             scanButton.style.display = "none";
             progressButton.style.display = "none";
+            top20 = sorted_buckets.slice(1, 20);   
+
+            const listContainer = document.createElement("div");
+            listContainer.id = "top10-list";
+            listContainer.style.maxHeight = "80vh";
+            listContainer.style.overflowY = "auto";
+            listContainer.style.padding = "10px";
+            listContainer.style.borderTop = "1px solid #ccc";
+            listContainer.style.marginRight = "15px";
+
+            const container = document.createElement("div");
+            container.style.display = "flex";
+            container.style.alignItems = "center";
+            container.style.marginBottom = "15px";
+            container.style.marginRight = "15px";
+            container.style.cursor = "pointer";
+            container.style.border = "1px solid #ddd";
+            container.style.padding = "10px";
+            container.style.borderRadius = "10px";
+            container.style.backgroundColor = "#f9f9f9";
+
 
             j = sorted_buckets[0].index
             console.log("j: ", j);
@@ -150,8 +172,7 @@ async function classifyFrame() {
             img = document.createElement('img');
             img.classList.add("round-img");
             img.src = imagePath;
-            popupWindow.appendChild(img);
-            wrongButton.style.display = "block";
+            container.appendChild(img);
 
             //header = document.createElement('h1');
             //header.textContent = label;
@@ -176,45 +197,171 @@ async function classifyFrame() {
 
                     const breakpt = document.createElement('br');
 
-                    popupWindow.appendChild(para);
-                    popupWindow.appendChild(breakpt);
-                    popupWindow.appendChild(breakpt);
+                    container.appendChild(para);
+                    container.appendChild(breakpt);
+                    container.appendChild(breakpt);
                 }
                 else if (match[key] && key == "Accession #") {
                     const para = document.createElement('p');
                     para.textContent = "Block no. " + match[key];
                     para.style.fontSize = "24px";
-                    popupWindow.appendChild(para);
+                    container.appendChild(para);
 
                 }    else if (match[key] && key == "Panel #") {
                     const breakpt = document.createElement('br');
-                    popupWindow.appendChild(breakpt);
+                    container.appendChild(breakpt);
                     const para = document.createElement('p');
                     para.textContent = "Panel: " + match[key];
                     para.style.fontSize = "24px";
-                    popupWindow.appendChild(para);
+                    container.appendChild(para);
                 }   
                     else if (match[key] && key == "page number") {
                     const para = document.createElement('p');
                     para.textContent = "Page: " + match[key];
                     para.style.fontSize = "24px";
-                    popupWindow.appendChild(para);
+                    container.appendChild(para);
                 } else if (match[key]){
                     const para = document.createElement('p');
                     para.innerHTML = match[key].replace(/\n/g, '<br>');
                     para.style.fontSize = "24px";
-                    popupWindow.appendChild(para);
+                    container.appendChild(para);
                 }
             });
+        
+            top20.forEach(entry => {
+                const container = document.createElement("div");
+                container.style.display = "flex";
+                container.style.alignItems = "center";
+                container.style.marginBottom = "15px";
+                container.style.marginRight = "15px";
+                container.style.cursor = "pointer";
+                container.style.border = "1px solid #ddd";
+                container.style.padding = "10px";
+                container.style.borderRadius = "10px";
+                container.style.backgroundColor = "#f9f9f9";
+            
+                const image = document.createElement("img");
+                image.src = `classimages/${classes[entry.index]}.jpg`;
+                image.style.width = "200px";
+                image.style.height = "250px";
+                image.style.objectFit = "cover";
+                image.style.marginRight = "15px";
+                image.style.borderRadius = "10px";
+            
+                const text = document.createElement("div");
+                text.innerHTML = `<strong>Class ${classes[entry.index]}</strong><br>Score: ${entry.value.toFixed(2)}`;
+            
+                container.appendChild(image);
+                container.appendChild(text);
+            
+                container.addEventListener("click", () => {
+        
+                    const listContainer = document.getElementById("top10-list");
+                    if (listContainer) {
+                        listContainer.remove();
+                    }
+        
+                    const imagePath = `classimages/${classes[entry.index]}.jpg`;
+                    img = document.createElement('img');
+                    img.classList.add("round-img");
+                    img.src = imagePath;
+                    popupWindow.appendChild(img);
+        
+                    const order = ["Title", "Description", "PUBLICATION Info as of April 15, 2025", "page number", "Panel #", "Accession #"];
+        
+                    const match = classData.find(row => row["Accession #"] === classes[entry.index]);
+                    console.log("Match: ", match);
+                    
+                    order.forEach((key) => {
+                        
+                        if (match[key] && key == "Title") {
+                            console.log("Title: ", match[key]);
+                            const para = document.createElement('p');
+                            para.innerHTML = `<span style="font-size: 40px; fontWeight: bold;">${match[key].replace(/\n/g, '<br>')}</span>`;
+                            //para.style.fontSize = "30px";
+                            //para.style.fontWeight = "bold";
+        
+                            const breakpt = document.createElement('br');
+        
+                            popupWindow.appendChild(para);
+                            popupWindow.appendChild(breakpt);
+                            popupWindow.appendChild(breakpt);
+                        }
+                        else if (match[key] && key == "Accession #") {
+                            const para = document.createElement('p');
+                            para.textContent = "Block no. " + match[key];
+                            para.style.fontSize = "24px";
+                            popupWindow.appendChild(para);
+        
+                        }    else if (match[key] && key == "Panel #") {
+                            const breakpt = document.createElement('br');
+                            popupWindow.appendChild(breakpt);
+                            const para = document.createElement('p');
+                            para.textContent = "Panel: " + match[key];
+                            para.style.fontSize = "24px";
+                            popupWindow.appendChild(para);
+                        }   
+                            else if (match[key] && key == "page number") {
+                            const para = document.createElement('p');
+                            para.textContent = "Page: " + match[key];
+                            para.style.fontSize = "24px";
+                            popupWindow.appendChild(para);
+                        } else if (match[key]){
+                            const para = document.createElement('p');
+                            para.innerHTML = match[key].replace(/\n/g, '<br>');
+                            para.style.fontSize = "24px";
+                            popupWindow.appendChild(para);
+                        }
+                    });
+                         
+        
+                    // header = document.createElement('h1');
+                    // header.textContent = label;
+                    // popupWindow.appendChild(header);
+        
+                    // confidencePara = document.createElement('p');
+                    // confidencePara.textContent = `Confidence: ${confidence}`;
+                    // popupWindow.appendChild(confidencePara);
+            
+                    // popupWindow.appendChild(largeImg);
+                    // popupWindow.appendChild(classHeader);
+                    // popupWindow.appendChild(scorePara);
+                    // popupWindow.appendChild(closeBtn);
+                    // popupWindow.style.display = "block";
+        
+        
+        
+                });
+            
+                listContainer.appendChild(container);
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
                 
 
 
                 // sort through pred_buckets and find the top 10 classes and their confidences (changed to top 20)
-
-                top10 = sorted_buckets.slice(0, 20);    
-
-                console.log("Pred buckets: ", pred_buckets);
-                console.log("Top 10 predictions: ", top10);
 
 
                 pred_buckets.fill(0);
@@ -390,7 +537,6 @@ closeButton.addEventListener("click", function() {
 
 wrongButton.addEventListener("click", function() {
     popupWindow.style.display = "none";
-    wrongButton.style.display = "none";
 
     //popupWindow.removeChild(confidencePara);
     // popupWindow.removeChild(header); 
@@ -416,7 +562,7 @@ wrongButton.addEventListener("click", function() {
     listContainer.style.overflowY = "auto";
     listContainer.style.padding = "10px";
     listContainer.style.borderTop = "1px solid #ccc";
-    listContainer.style.marginRight = "150px";
+    listContainer.style.marginRight = "15px";
 
     top10.forEach(entry => {
         const container = document.createElement("div");
@@ -439,7 +585,7 @@ wrongButton.addEventListener("click", function() {
         image.style.borderRadius = "10px";
     
         const text = document.createElement("div");
-        text.innerHTML = `<strong>Class ${classes[entry.index]}</strong><br>Score: ${entry.bucket.toFixed(2)}`;
+        text.innerHTML = `<strong>Class ${classes[entry.index]}</strong><br>Score: ${entry.value.toFixed(2)}`;
     
         container.appendChild(image);
         container.appendChild(text);
@@ -450,7 +596,6 @@ wrongButton.addEventListener("click", function() {
             if (listContainer) {
                 listContainer.remove();
             }
-            wrongButton.style.display = "block";
             // const images = popupWindow.querySelectorAll("img");
             // images.forEach(img => popupWindow.removeChild(img));
 

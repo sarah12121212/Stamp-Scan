@@ -10,10 +10,16 @@
   padding: 0;
   box-sizing: border-box;
   canvas {display: block; margin: 20px auto;}
+  
+
+  font-weight: 400;
 }
 
+* {
+  font-family: 'Merriweather', sans-serif;
+}
 body {
-  font-family: 'Arvo', serif;
+
   background: #242321;
 }            
 
@@ -47,7 +53,7 @@ body {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  font-family: 'Lato', sans-serif;
+
   letter-spacing: 0.5px;
   font-weight: 400;
 }
@@ -152,7 +158,7 @@ body {
 
 
 .arvo-regular {
-  font-family: "Arvo", serif;
+
   font-weight: 400;
   font-style: normal;
 }
@@ -177,40 +183,41 @@ body {
 
 #scan-button {
   position: fixed;
-  bottom: 20%;
+  bottom: 10%;
   left: 50%;
   transform: translateX(-50%);
   background-color: #ffffff;
   color: rgb(0, 0, 0);
   border: 4px solid #919191;
   border-radius: 50%; 
-  width: 150px;       
-  height: 150px;      
-  font-size: 22px;
+  width: 350px;       
+  height: 350px;      
+  font-size: 50px;
   cursor: pointer;
   user-select: none;
   outline: none;
   text-align: center;
   line-height: 100px; 
+  font-family: 'Merriweather', sans-serif;
 }
 
 #wrong-button {
   position: fixed;
   bottom: 5%;
-  right: 2%;
+  right: 1%;
   transform: translateX(-50%);
-  background-color: #a7a7a7;
-  color: white;
-  border: none;
-  border-radius: 15%; 
-  width: 160px;       
-  height: 100px;      
-  font-size: 22px;
-  cursor: pointer;
+  background-color: #053f47;
+  color: rgb(255, 255, 255);
+  /* border: none; */
+  /* border-radius: 15%;  */
+  width: 250px;       
+  height: 150px;      
+  font-size: 30px;
+  /* cursor: pointer;
   user-select: none;
-  outline: none;
+  outline: none; */
   text-align: center;
-  line-height: 100px; 
+  line-height: 50px; 
 }
 
 #close-button {
@@ -237,4 +244,45 @@ body {
   height: 30px;
   background-color: green;
 }
+#video-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
 
+#video-display {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#progressdiv {
+    position: absolute;
+    top: 0; /* Position the progress bar at the top of the video */
+    left: 0;
+    width: 100%;
+
+    height: 3%; /* Adjust the height of the progress bar */
+}
+
+.progress-bar {
+    height: 100%; /* Ensure the progress bar fills the height of its container */
+}
+
+#progress-button {
+  position: fixed;
+  top: 0; /* Position at the top of the video */
+  left: 0;
+  width: 100%; /* Full width */
+  height: 6%; /* Adjust height as needed */
+  background: linear-gradient(to right, #17a2b8 0%, #e9ecef 0%); /* Simulate progress */
+  color: black;
+  border: none;
+  text-align: center;
+  font-size: 24px;
+  z-index: 10; /* Ensure it appears above the video */
+  pointer-events: none; /* Prevent interaction */
+}
