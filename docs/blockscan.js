@@ -107,7 +107,7 @@ scanButton.addEventListener('touchcancel', stopScanning);
 let model;
 
 async function loadModel2() {
-    const modelUrl = 'https://raw.githubusercontent.com/BlockScanning/Block-Scan/refs/heads/main/docs/allpanels3_mobilenet/model.json';
+    const modelUrl = 'https://raw.githubusercontent.com/sarah12121212/Stamp-Scan/refs/heads/main/docs/20250521/model.json';
     console.log("modelURL:", modelUrl);
     try {
         console.log("Loading model from:", modelUrl);
