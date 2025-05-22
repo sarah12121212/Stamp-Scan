@@ -49,7 +49,7 @@ function runScanLoop() {
 
 const scanButton = document.getElementById('scan-button');
 scanButton.style.display = 'none';
-
+console.log("loading")
 const loadingUI = document.createElement('div');
 loadingUI.style.textAlign = 'center';
 loadingUI.style.padding = '20px';
